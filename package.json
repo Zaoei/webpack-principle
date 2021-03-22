@@ -1,0 +1,25 @@
+{
+  "name": "webpack-principer",
+  "version": "1.0.0",
+  "description": "webpack-原理",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Zaoei/webpack-principer.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Zaoei/webpack-principer/issues"
+  },
+  "homepage": "https://github.com/Zaoei/webpack-principer#readme",
+  "devDependencies": {
+    "@babel/core": "^7.13.10",
+    "@babel/parser": "^7.13.11",
+    "@babel/preset-env": "^7.13.10",
+    "@babel/traverse": "^7.13.0"
+  }
+}
