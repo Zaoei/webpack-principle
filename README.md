@@ -1,2 +1,2 @@
-# webpack-principer
+# webpack-principle
 webpack-原理
