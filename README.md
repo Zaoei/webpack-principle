@@ -1,8 +1,42 @@
-# webpack-principle
+@[TOC](webpack构建原理)
 
-webpack-原理
+# 什么是 webpack ?
+> 本质上,webpack 是一个现代 JavaScript 应用程序的静态模块打包器(module bundler)。 当 webpack 处理应用程序时,它会递归地构建一个依赖关系图(dependency graph),其中包含应用程序需要的每个模块,然后将所有这些模块打包成一个或多个 bundle。
 
-## webpack 构建流程
+  webpack 就像一条生产线,要经过一系列处理流程后才能将源文件转换成输出结果。 这条生产线上的每个处理流程的职责都是单一的,多个流程之间有存在依赖关系,只有完成当前处理后才能交给下一个流程去处理。 插件就像是一个插入到生产线中的一个功能,在特定的时机对生产线上的资源做处理。webpack 通过 Tapable 来组织这条复杂的生产线。 > > webpack 在运行过程中会广播事件,插件只需要监听它所关心的事件,就能加入到这条生产线中,去改变生产线的运作。 webpack 的事件流机制保证了插件的有序性,使得整个系统扩展性很好。 ---- 深入浅出 webpack 吴浩麟
+
+# webpack 核心概念
+
+## Entry -- 入口起点(entry point)
+指示 webpack 应该使用哪个模块，来作为构建其内部依赖图的开始。
+
+进入入口起点后，webpack 会找出有哪些模块和库是入口点 (直接和间接) 依赖。
+
+每个依赖项随即被处理，最后输出到 bundles 的文件中。
+
+## Output -- 文件输出
+output 属性告诉 webpack 再哪里输出它创建的 bundles，以及如何命名这些文件，默认值为 ./dist。
+
+## Module -- 模块
+在 webpack 里一切皆模块，一个模块对应着一个文件。webpack 会从配置的 entry 开始递归找出所有依赖的模块。
+
+## Chunk -- 代码块
+一个 chunk 由多个模块组合而成，用于代码合并和分隔。
+
+## Loader -- 转换器
+loader 让 webpack 能够去处理非 javaScript 文件(webpack 自身值能理解 javaScript)。
+
+loader 可以将所有类型的文件转换为 webpack 可以处理的有效模块，然后就可以利用 webpack 的打包能力，对它们进行处理。
+
+本质上, webpack loader 将所有类型的文件，转换为应用程序的依赖图(和最终的 bundle) 可以直接引用的模块。
+
+## Plugin -- 插件
+loader 被用于转换默写类型的模块，而插件可以用于执行范围更广的任务。
+
+插件的范围包括，从打包优化到压缩，一直到重新定义环境中的变量。插件接口功能极其强大，可以用来处理各种各样的任务。
+
+
+# webpack 构建流程
 
 Webpack 的运行流程是一个串行的过程,从启动到结束会依次执行以下流程 :
 

@@ -46,14 +46,15 @@ class Compiler {
     // 解析入口文件
     const info = this.build(this.entry);
     this.modules.push(info);
-    this.modules.forEach(({ dependencies }) => {
+    for (let index = 0; index > this.modules.length; index++) {
       // 判断有依赖对象,递归解析所有依赖项
+      const dependencies = this.modules[index].dependencies;
       if (dependencies) {
         for (const dependency in dependencies) {
           this.modules.push(this.build(dependencies[dependency]));
         }
       }
-    });
+    }
     // 生成依赖关系图
     const dependencyGraph = this.modules.reduce(
       (graph, item) => ({
@@ -66,7 +67,7 @@ class Compiler {
     this.generate(dependencyGraph);
   }
   build(filename) {
-    const { getAst, getDependencies: getDependencies, getCode } = Parser;
+    const { getAst, getDependencies, getCode } = Parser;
     const ast = getAst(filename);
     const dependencies = getDependencies(ast, filename);
     const code = getCode(ast);
@@ -87,7 +88,7 @@ class Compiler {
     const bundle = `(function(graph){    
                       function require(module){       
                         function localRequire(relativePath){        
-                          return require(graph[module].dependecies[relativePath]) 
+                          return require(graph[module].dependencies[relativePath]) 
                         }      
                         var exports = {};    
                         (function(require,exports,code){       
