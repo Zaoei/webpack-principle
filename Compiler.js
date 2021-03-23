@@ -12,11 +12,13 @@ const Parser = {
     return parser.parse(content, { sourceType: 'module' });
   },
   getDependencies: (ast, filename) => {
-    const dependencies = {}; // 遍历所有的 import 模块,存入dependecies
+    const dependencies = {};
+    // 遍历所有的 import 模块,存入dependencies
     traverse(ast, {
       // 类型为 ImportDeclaration 的 AST 节点 (即为import 语句)
       ImportDeclaration({ node }) {
-        const dirname = path.dirname(filename); // 保存依赖模块路径,之后生成依赖关系图需要用到
+        const dirname = path.dirname(filename);
+        // 保存依赖模块路径,之后生成依赖关系图需要用到
         const filepath = './' + path.join(dirname, node.source.value);
         dependencies[node.source.value] = filepath;
       }
@@ -44,21 +46,24 @@ class Compiler {
     // 解析入口文件
     const info = this.build(this.entry);
     this.modules.push(info);
-    this.modules.forEach(({ dependecies: dependencies }) => {
+    this.modules.forEach(({ dependencies }) => {
       // 判断有依赖对象,递归解析所有依赖项
       if (dependencies) {
         for (const dependency in dependencies) {
           this.modules.push(this.build(dependencies[dependency]));
         }
       }
-    }); // 生成依赖关系图
+    });
+    // 生成依赖关系图
     const dependencyGraph = this.modules.reduce(
       (graph, item) => ({
-        ...graph, // 使用文件路径作为每个模块的唯一标识符,保存对应模块的依赖对象和文件内容
+        ...graph,
+        // 使用文件路径作为每个模块的唯一标识符,保存对应模块的依赖对象和文件内容
         [item.filename]: { dependencies: item.dependencies, code: item.code }
       }),
       {}
     );
+    this.generate(dependencyGraph);
   }
   build(filename) {
     const { getAst, getDependencies: getDependencies, getCode } = Parser;
@@ -67,14 +72,18 @@ class Compiler {
     const code = getCode(ast);
     return {
       // 文件路径,可以作为每个模块的唯一标识符
-      filename, // 依赖对象,保存着依赖模块路径
-      dependecies: dependencies, // 文件内容
+      filename,
+      // 依赖对象,保存着依赖模块路径
+      dependencies: dependencies,
+      // 文件内容
       code
     };
-  } // 重写 require函数,输出bundle
+  }
+  // 重写 require函数,输出bundle
   generate() {
     // 输出文件路径
-    const filePath = path.join(this.output.path, this.output.filename); // 懵逼了吗? 没事,下一节我们捋一捋
+    const filePath = path.join(this.output.path, this.output.filename);
+    // 懵逼了吗? 没事,下一节我们捋一捋
     const bundle = `(function(graph){    
                       function require(module){       
                         function localRequire(relativePath){        
