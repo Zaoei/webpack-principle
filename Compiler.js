@@ -1,16 +1,18 @@
-const fs = require('fs');
-const parser = require('@babel/parser');
+const fs = require('fs'); // 引入node文件模块
+const path = require('path');
+const parser = require('@babel/parser'); // 将文件内容转为AST抽象语法树
 const options = require('./webpack.config');
-const parser = require('@babel/parser');
 const traverse = require('@babel/traverse').default;
 const { transformFromAst } = require('@babel/core');
 
 const Parser = {
+  // 转换ast抽象语法树
   getAst: (path) => {
     // 读取入口文件
     const content = fs.readFileSync(path, 'utf-8'); // 将文件内容转为AST抽象语法树
     return parser.parse(content, { sourceType: 'module' });
   },
+  // 生成依赖关系
   getDependencies: (ast, filename) => {
     const dependencies = {};
     // 遍历所有的 import 模块,存入dependencies
@@ -25,8 +27,8 @@ const Parser = {
     });
     return dependencies;
   },
+  // AST转换为code
   getCode: (ast) => {
-    // AST转换为code
     const { code } = transformFromAst(ast, null, {
       presets: ['@babel/preset-env']
     });
@@ -37,17 +39,20 @@ const Parser = {
 class Compiler {
   constructor(options) {
     // webpack 配置
-    const { entry, output } = options; // 入口
-    this.entry = entry; // 出口
-    this.output = output; // 模块
-    this.modules = [];
-  } // 构建启动
+    const { entry, output } = options;
+    this.entry = entry; // 入口
+    this.output = output; // 出口
+    this.modules = []; // 模块
+  }
+
+  // 构建启动
   run() {
     // 解析入口文件
     const info = this.build(this.entry);
     this.modules.push(info);
-    for (let index = 0; index > this.modules.length; index++) {
+    for (let index = 0; index < this.modules.length; index++) {
       // 判断有依赖对象,递归解析所有依赖项
+      console.log(this.modules);
       const dependencies = this.modules[index].dependencies;
       if (dependencies) {
         for (const dependency in dependencies) {
@@ -66,6 +71,7 @@ class Compiler {
     );
     this.generate(dependencyGraph);
   }
+  // 返回模块信息
   build(filename) {
     const { getAst, getDependencies, getCode } = Parser;
     const ast = getAst(filename);
@@ -81,7 +87,7 @@ class Compiler {
     };
   }
   // 重写 require函数,输出bundle
-  generate() {
+  generate(code) {
     // 输出文件路径
     const filePath = path.join(this.output.path, this.output.filename);
     // 懵逼了吗? 没事,下一节我们捋一捋
